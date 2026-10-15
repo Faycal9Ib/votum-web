@@ -150,8 +150,9 @@
 	 * 2. Rastro de laboratorio bajo el cursor
 	 * ======================================================= */
 	const CELL = 20;
-	const POOL = 36;          // cuadros reutilizables (suficientes para leer una palabra entera)
-	const LIFETIME = 900;     // ms que permanece cada cuadro antes de apagarse
+	const POOL = 24;          // cuadros reutilizables
+	// Vida de cada cuadro: 140–460 ms, como el original. Más largo da sensación de web lenta.
+	const lifetime = () => 140 + Math.random() * 320;
 	const RESTART_AFTER = 900; // si el cursor se para más que esto, la siguiente letra empieza palabra nueva
 	const KEYWORDS = [ 'VOTUM LABS', 'SOSPETS', 'CRONIDOL', 'CBD', 'CBG', 'CBN', 'VEZELAY LAB' ];
 	const SEPARATORS = [ '+', '−', '=', '·', '/', '°', 'µ', 'Δ', '%' ];
@@ -241,7 +242,7 @@
 			b.el.classList.remove( 'is-active' );
 			void b.el.offsetWidth; // reinicia la transición si el cuadro se reutiliza antes de apagarse
 			b.el.classList.add( 'is-active' );
-			b.timer = setTimeout( () => b.el.classList.remove( 'is-active' ), LIFETIME );
+			b.timer = setTimeout( () => b.el.classList.remove( 'is-active' ), lifetime() );
 		};
 
 		// Toda la web reacciona al cursor (salvo cabecera, texto, enlaces y zonas marcadas con data-vt-no-trail).
