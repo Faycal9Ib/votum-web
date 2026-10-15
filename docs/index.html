@@ -5,7 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Votum Labs &#8211; Laboratorio biotecnológico</title>
 <meta name="robots" content="noindex, nofollow">
-<style id="wp-img-auto-sizes-contain-inline-css">
+	<script>try{var p=JSON.parse(localStorage.getItem('votumA11y')||'{}'),c=document.documentElement.classList;if(p.text)c.add('a11y-text-'+p.text);['contrast','links','readable','reduce-motion'].forEach(function(k){if(p[k])c.add('a11y-'+k)})}catch(e){}</script>
+	<style id="wp-img-auto-sizes-contain-inline-css">
 img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 /*# sourceURL=wp-img-auto-sizes-contain-inline-css */
 </style>
@@ -25,7 +26,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 /*# sourceURL=global-styles-inline-css */
 </style>
 
-<link rel='stylesheet' id='orbita-css' href='style.css?ver=2.1.0' media='all' />
+<link rel='stylesheet' id='orbita-css' href='style.css?ver=2.2.2' media='all' />
 <link rel="icon" type="image/svg+xml" href="assets/img/votumlabs-fav.svg">
 </head>
 <body class="home blog wp-theme-orbita">
@@ -70,7 +71,22 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 			<a class="ob-icon-btn" href="https://votumlabs.com/?page_id=18" aria-label="Tienda">
 				<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="6.5" width="13" height="11.5" rx="2.5"/><path d="M7 6.5V5.5a3 3 0 016 0v1"/></svg>
 			</a>
-			<button class="ob-icon-btn ob-menu-trigger" type="button" aria-expanded="false" aria-controls="ob-menu" aria-label="Menú">
+				<div class="ob-lang">
+		<button class="ob-lang__toggle" type="button" aria-expanded="false" aria-controls="ob-lang-list">
+			<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="7.25"/><path d="M2.75 10h14.5M10 2.75c2 2.1 3 4.5 3 7.25s-1 5.15-3 7.25c-2-2.1-3-4.5-3-7.25s1-5.15 3-7.25z"/></svg>
+			<span class="screen-reader-text">Idioma: Español</span>
+			<span class="ob-lang__code" aria-hidden="true">ES</span>
+		</button>
+		<ul class="ob-lang__list" id="ob-lang-list" hidden>
+							<li>
+											<span class="ob-lang__item is-current" aria-current="true" lang="es">Español</span>
+									</li>
+							<li>
+											<span class="ob-lang__item is-disabled" aria-disabled="true" lang="en">English <small>próximamente</small></span>
+									</li>
+					</ul>
+	</div>
+				<button class="ob-icon-btn ob-menu-trigger" type="button" aria-expanded="false" aria-controls="ob-menu" aria-label="Menú">
 				<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h14M3 13h14"/></svg>
 			</button>
 		</div>
@@ -252,10 +268,41 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 </ul>		</div>
 	</div>
 </footer>
-<script type="speculationrules">
+	<div class="ob-a11y" data-vt-no-trail>
+		<button class="ob-a11y__toggle" type="button" aria-expanded="false" aria-controls="ob-a11y-panel">
+			<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.5" r="2"/><path d="M4.5 8.2c2.4.6 4.9.9 7.5.9s5.1-.3 7.5-.9l.5 1.6c-1.9.5-3.9.8-6 .9v3.6l2.3 6.9-1.6.6-2.2-6.3h-1l-2.2 6.3-1.6-.6L10 14.3v-3.6c-2.1-.1-4.1-.4-6-.9z"/></svg>
+			<span class="screen-reader-text">Opciones de accesibilidad</span>
+		</button>
+		<div class="ob-a11y__panel" id="ob-a11y-panel" role="group" aria-labelledby="ob-a11y-title" hidden>
+			<p class="ob-a11y__title" id="ob-a11y-title">Accesibilidad</p>
+			<div class="ob-a11y__row" role="group" aria-label="Tamaño del texto">
+				<span>Tamaño del texto</span>
+				<div class="ob-a11y__sizes">
+					<button type="button" data-a11y-text="0" aria-pressed="true" aria-label="Texto normal">A</button>
+					<button type="button" data-a11y-text="1" aria-pressed="false" aria-label="Texto grande">A+</button>
+					<button type="button" data-a11y-text="2" aria-pressed="false" aria-label="Texto muy grande">A++</button>
+				</div>
+			</div>
+							<button type="button" class="ob-a11y__switch" data-a11y="contrast" aria-pressed="false">
+					<span>Alto contraste</span><span class="ob-a11y__knob" aria-hidden="true"></span>
+				</button>
+							<button type="button" class="ob-a11y__switch" data-a11y="links" aria-pressed="false">
+					<span>Subrayar enlaces</span><span class="ob-a11y__knob" aria-hidden="true"></span>
+				</button>
+							<button type="button" class="ob-a11y__switch" data-a11y="readable" aria-pressed="false">
+					<span>Fuente legible</span><span class="ob-a11y__knob" aria-hidden="true"></span>
+				</button>
+							<button type="button" class="ob-a11y__switch" data-a11y="reduce-motion" aria-pressed="false">
+					<span>Detener animaciones</span><span class="ob-a11y__knob" aria-hidden="true"></span>
+				</button>
+						<button type="button" class="ob-a11y__reset" data-a11y-reset>Restablecer</button>
+		</div>
+	</div>
+	<script type="speculationrules">
 {"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/wordpress/*"},{"not":{"href_matches":["/wordpress/wp-*.php","/wordpress/wp-admin/*","/wordpress/wp-content/uploads/*","/wordpress/wp-content/*","/wordpress/wp-content/plugins/*","/wordpress/wp-content/themes/orbita/*","/wordpress/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
 </script>
-<script data-wp-strategy="defer" defer id="orbita-js" src="assets/js/main.js?ver=2.1.0"></script>
-<script data-wp-strategy="defer" defer id="orbita-effects-js" src="assets/js/effects.js?ver=2.1.0"></script>
+<script data-wp-strategy="defer" defer id="orbita-js" src="assets/js/main.js?ver=2.2.2"></script>
+<script data-wp-strategy="defer" defer id="orbita-effects-js" src="assets/js/effects.js?ver=2.2.2"></script>
+<script data-wp-strategy="defer" defer id="orbita-a11y-js" src="assets/js/a11y.js?ver=2.2.2"></script>
 </body>
 </html>

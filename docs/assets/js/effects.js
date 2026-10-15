@@ -14,6 +14,8 @@
 ( () => {
 	const reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
 	const finePointer = window.matchMedia( '(hover: hover) and (pointer: fine)' );
+	// Respeta la preferencia del sistema y la opción «Detener animaciones» del panel de accesibilidad.
+	const noMotion = () => reducedMotion.matches || document.documentElement.classList.contains( 'a11y-reduce-motion' );
 
 	/* =========================================================
 	 * 1. Descifrado de texto
@@ -51,6 +53,10 @@
 
 	function decode( el ) {
 		if ( ! prepare( el ) || el.vtRunning ) return;
+		if ( noMotion() ) {
+			el.vtAnim.textContent = el.vtText;
+			return;
+		}
 		const text = el.vtText;
 		const n = text.length;
 		const step = Math.min( 45, MAX_TOTAL_MS / Math.max( n, 1 ) );
@@ -105,7 +111,7 @@
 
 	function initDecode() {
 		const all = document.querySelectorAll( '[data-vt-decode]' );
-		if ( reducedMotion.matches ) return;
+		if ( noMotion() ) return;
 
 		const onView = [];
 		all.forEach( ( el ) => {
@@ -149,7 +155,7 @@
 	const DARK_TEXT_ON = new Set( [ '#a8e0ec', '#f1e2b4', '#b9c6f0' ] );
 
 	function initTrail() {
-		if ( reducedMotion.matches || ! finePointer.matches ) return;
+		if ( ! finePointer.matches ) return;
 
 		const zones = document.querySelectorAll( '[data-vt-trail]' );
 		if ( ! zones.length ) return;
@@ -178,7 +184,7 @@
 		};
 
 		const onMove = ( e ) => {
-			if ( paused || isTextTarget( e.target ) ) return;
+			if ( paused || noMotion() || isTextTarget( e.target ) ) return;
 			const x = CELL * Math.floor( e.clientX / CELL );
 			const y = CELL * Math.floor( e.clientY / CELL );
 			if ( x === lastX && y === lastY ) return;
@@ -208,6 +214,14 @@
 		// Al hacer scroll la rejilla se mueve con la página: se apagan los cuadros visibles.
 		window.addEventListener( 'scroll', () => blocks.forEach( ( b ) => b.el.classList.remove( 'is-active' ) ), { passive: true } );
 	}
+
+	document.addEventListener( 'votum:a11ychange', () => {
+		if ( ! noMotion() ) return;
+		document.querySelectorAll( '[data-vt-decode]' ).forEach( ( el ) => {
+			if ( el.vtAnim ) el.vtAnim.textContent = el.vtText;
+		} );
+		document.querySelectorAll( '.vt-trail__block' ).forEach( ( b ) => b.classList.remove( 'is-active' ) );
+	} );
 
 	initDecode();
 	initTrail();
