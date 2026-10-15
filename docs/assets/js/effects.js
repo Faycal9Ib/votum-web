@@ -5,8 +5,9 @@
  *    antes de fijarse, cada posición «baraja» 2–3 glifos de laboratorio en color de acento.
  *    - data-vt-decode            → al entrar en pantalla (una vez)
  *    - data-vt-decode="hover"    → al pasar el ratón (cada vez)
- * 2. Rastro de laboratorio: un pool de cuadros de 20 px sigue al cursor sobre una rejilla,
- *    cada uno con un color iridiscente y un glifo científico. Solo sobre zonas sin texto.
+ * 2. Rastro de laboratorio: un pool de cuadros de 20 px sigue al cursor sobre una rejilla y
+ *    va deletreando palabras clave (Votum Labs, SosPets, Cronidol, CBD…) separadas por símbolos.
+ *    Solo sobre zonas sin texto.
  *
  * Basado en el análisis de los componentes TextUnscramble/Eyebrow y CursorTrailAnimation
  * de githubuniverse.com (REA), reimplementado sin dependencias.
@@ -149,16 +150,46 @@
 	 * 2. Rastro de laboratorio bajo el cursor
 	 * ======================================================= */
 	const CELL = 20;
-	const POOL = 12;
+	const POOL = 36;          // cuadros reutilizables (suficientes para leer una palabra entera)
+	const LIFETIME = 900;     // ms que permanece cada cuadro antes de apagarse
+	const RESTART_AFTER = 900; // si el cursor se para más que esto, la siguiente letra empieza palabra nueva
+	const KEYWORDS = [ 'VOTUM LABS', 'SOSPETS', 'CRONIDOL', 'CBD', 'CBG', 'CBN', 'VEZELAY LAB' ];
+	const SEPARATORS = [ '+', '−', '=', '·', '/', '°', 'µ', 'Δ', '%' ];
 	const COLORS = [ '#9a7be6', '#5fb7e6', '#a8e0ec', '#f1e2b4', '#b9c6f0', '#c7a4ff' ];
-	const TRAIL_GLYPHS = [ '+', '−', '=', '·', '°', 'µ', 'Δ', '%', 'C', 'B', 'D', 'A', 'G', 'T', '/' ];
 	const DARK_TEXT_ON = new Set( [ '#a8e0ec', '#f1e2b4', '#b9c6f0' ] );
+	const pick = ( list ) => list[ Math.floor( Math.random() * list.length ) ];
+
+	/**
+	 * Flujo de caracteres: palabra clave (un color por palabra) + un símbolo separador, sin fin.
+	 * Cada celda nueva bajo el cursor toma el siguiente carácter, así el rastro «escribe» las marcas.
+	 */
+	function createStream() {
+		let queue = [];
+		let lastWord = '';
+		let lastColor = '';
+		const refill = () => {
+			let word = pick( KEYWORDS );
+			while ( word === lastWord ) word = pick( KEYWORDS );
+			let color = pick( COLORS );
+			while ( color === lastColor ) color = pick( COLORS );
+			lastWord = word;
+			lastColor = color;
+			queue = [ ...word ].map( ( ch ) => ( { ch: ch === ' ' ? '' : ch, color, sep: false } ) );
+			queue.push( { ch: pick( SEPARATORS ), color: '', sep: true } );
+		};
+		return {
+			next() {
+				if ( ! queue.length ) refill();
+				return queue.shift();
+			},
+			restart() {
+				queue = [];
+			},
+		};
+	}
 
 	function initTrail() {
 		if ( ! finePointer.matches ) return;
-
-		const zones = document.querySelectorAll( '[data-vt-trail]' );
-		if ( ! zones.length ) return;
 
 		const layer = document.createElement( 'div' );
 		layer.className = 'vt-trail';
@@ -172,41 +203,49 @@
 		} );
 		document.body.appendChild( layer );
 
+		const stream = createStream();
 		let lastX = -1;
 		let lastY = -1;
+		let lastTime = 0;
 		let next = 0;
 		let paused = false;
 
 		const isTextTarget = ( target ) => {
-			if ( target.closest( 'a, button, input, textarea, select, label, [data-vt-no-trail]' ) ) return true;
+			if ( target.closest( 'a, button, input, textarea, select, label, [data-vt-no-trail], .ob-globalnav' ) ) return true;
 			// Igual que el original: un elemento «hoja» con texto es texto; uno vacío o contenedor no.
 			return target.children.length === 0 && target.textContent.trim() !== '';
 		};
 
 		const onMove = ( e ) => {
-			if ( paused || noMotion() || isTextTarget( e.target ) ) return;
+			if ( paused || noMotion() || ! ( e.target instanceof Element ) || isTextTarget( e.target ) ) return;
 			const x = CELL * Math.floor( e.clientX / CELL );
 			const y = CELL * Math.floor( e.clientY / CELL );
 			if ( x === lastX && y === lastY ) return;
 			lastX = x;
 			lastY = y;
 
+			const now = performance.now();
+			if ( now - lastTime > RESTART_AFTER ) stream.restart(); // tras una pausa, se empieza una palabra entera
+			lastTime = now;
+
+			const token = stream.next();
 			const b = blocks[ next ];
 			next = ( next + 1 ) % POOL;
-			const color = COLORS[ Math.floor( Math.random() * COLORS.length ) ];
 
 			clearTimeout( b.timer );
 			b.el.style.transform = `translate(${ x }px, ${ y }px)`;
-			b.cell.style.backgroundColor = color;
-			b.cell.style.color = DARK_TEXT_ON.has( color ) ? '#000' : '#fff';
-			b.cell.textContent = Math.random() < 0.3 ? '' : TRAIL_GLYPHS[ Math.floor( Math.random() * TRAIL_GLYPHS.length ) ];
+			b.el.classList.toggle( 'is-sep', token.sep );
+			b.cell.style.backgroundColor = token.sep ? '' : token.color;
+			b.cell.style.color = token.sep ? '' : ( DARK_TEXT_ON.has( token.color ) ? '#000' : '#fff' );
+			b.cell.textContent = token.ch;
 			b.el.classList.remove( 'is-active' );
 			void b.el.offsetWidth; // reinicia la transición si el cuadro se reutiliza antes de apagarse
 			b.el.classList.add( 'is-active' );
-			b.timer = setTimeout( () => b.el.classList.remove( 'is-active' ), 140 + Math.random() * 320 );
+			b.timer = setTimeout( () => b.el.classList.remove( 'is-active' ), LIFETIME );
 		};
 
-		zones.forEach( ( z ) => z.addEventListener( 'mousemove', onMove, { passive: true } ) );
+		// Toda la web reacciona al cursor (salvo cabecera, texto, enlaces y zonas marcadas con data-vt-no-trail).
+		document.addEventListener( 'mousemove', onMove, { passive: true } );
 		document.querySelectorAll( '[data-vt-no-trail]' ).forEach( ( z ) => {
 			z.addEventListener( 'mouseenter', () => ( paused = true ) );
 			z.addEventListener( 'mouseleave', () => ( paused = false ) );
