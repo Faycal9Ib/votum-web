@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Votum Labs · B2B Catalogue 2026</title>
+<style>
+@font-face { font-family: "Inter"; font-weight: 100 900; src: url("../docs/assets/fonts/inter-latin-wght-normal.woff2") format("woff2"); }
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; color: #000; font-size: 9.5pt; line-height: 1.45;
+	-webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; height: 297mm; position: relative; overflow: hidden; page-break-after: always; break-after: page;
+	padding: 18mm 16mm 20mm; display: flex; flex-direction: column; }
+.page:last-child { page-break-after: auto; break-after: auto; }
+h1, h2, h3 { font-weight: 400; letter-spacing: -.02em; margin: 0; }
+.eyebrow { font-size: 8pt; text-transform: uppercase; letter-spacing: .14em; color: #5c5c66; margin: 0 0 3mm; }
+.grad-text { background: linear-gradient(90deg,#7b5ce0,#3f97cf,#b98a2e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rule { height: 1.4mm; width: 34mm; border-radius: 1mm; background: linear-gradient(90deg,#7b5ce0,#3f97cf,#b98a2e); margin: 6mm 0; }
+.folio { position: absolute; left: 16mm; right: 16mm; bottom: 9mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: #8a8a94; }
+
+/* Portada */
+.cover { padding: 0; color: #000; }
+.cover__bg { position: absolute; inset: 0; background: url("../docs/assets/img/hero-october-votumlabs.webp") 62% center / cover; }
+.cover__card { position: absolute; left: 14mm; right: 14mm; bottom: 16mm; background: rgba(255,255,255,.9); border-radius: 9mm; padding: 14mm 14mm 13mm; }
+.cover__brand { display: flex; align-items: center; gap: 3mm; font-size: 11pt; letter-spacing: .12em; text-transform: uppercase; }
+.cover__brand img { width: 7mm; height: 8mm; }
+.cover h1 { font-size: 46pt; line-height: 1; margin: 9mm 0 4mm; }
+.cover p { font-size: 13pt; line-height: 1.35; margin: 0; max-width: 140mm; color: #222; }
+.cover__edition { position: absolute; top: 14mm; right: 14mm; background: #000; color: #fff; border-radius: 99px; padding: 2.4mm 5mm; font-size: 9pt; letter-spacing: .08em; }
+
+/* Quiénes somos */
+.lead { font-size: 15pt; line-height: 1.35; font-weight: 300; margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 9mm 0 11mm; }
+.fact { border-radius: 6mm; padding: 6mm; background: linear-gradient(110deg,#c7a4ff,#a8e0ec,#f1e2b4); }
+.fact strong { display: block; font-size: 20pt; font-weight: 400; letter-spacing: -.02em; }
+.fact span { font-size: 8.5pt; color: #2b2b33; }
+h2.section { font-size: 22pt; margin: 0 0 5mm; }
+.steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4mm; counter-reset: s; }
+.step { border-radius: 6mm; background: #f4f4f7; padding: 5.5mm 6mm; counter-increment: s; }
+.step::before { content: counter(s, decimal-leading-zero); display: block; color: #7b5ce0; font-size: 8.5pt; margin-bottom: 2.5mm; }
+.step h3 { font-size: 12pt; margin-bottom: 1.5mm; }
+.step p { margin: 0; color: #333; }
+.brands-block { margin-top: auto; }
+.brands { display: flex; gap: 5mm; }
+.brand { flex: 1; height: 24mm; border-radius: 6mm; background: #f4f4f7; display: flex; align-items: center; justify-content: center; }
+.brand img { max-height: 11mm; max-width: 60%; }
+
+/* Línea de producto */
+.line-head { display: flex; gap: 7mm; align-items: center; margin-bottom: 7mm; }
+.line-orb { flex: none; width: 24mm; height: 24mm; border-radius: 50%; box-shadow: inset -5mm -6mm 12mm rgba(255,255,255,.5); }
+.line-head h2 { font-size: 30pt; line-height: 1; }
+.line-head p { margin: 2.5mm 0 0; color: #333; font-size: 10pt; max-width: 125mm; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5mm; flex: 1; align-content: start; }
+.grid--3 { grid-template-columns: 1fr; gap: 4.5mm; }
+.card { border: .3mm solid #e3e3ea; border-radius: 6mm; overflow: hidden; display: flex; flex-direction: column; break-inside: avoid; }
+.card__media { position: relative; height: 40mm; display: flex; align-items: center; justify-content: center; }
+.card__media::before { content: ""; position: absolute; inset: 0; background: var(--grad); opacity: .45; }
+.card__media img { position: relative; max-height: 35mm; max-width: 70%; object-fit: contain; filter: drop-shadow(0 2mm 3mm rgba(40,30,90,.18)); }
+.card__body { padding: 4mm 5mm 4.5mm; }
+.card h3 { font-size: 13.5pt; margin: 0 0 1mm; }
+.card .claim { margin: 0 0 3mm; color: #222; }
+.card dl { margin: 0; display: grid; grid-template-columns: 19mm 1fr; gap: 1.4mm 2mm; font-size: 8pt; }
+.card dt { color: #6a6a74; }
+.card dd { margin: 0; color: #111; }
+.grid--3 .card { flex-direction: row; min-height: 62mm; }
+.grid--3 .card__media { width: 66mm; height: auto; flex: none; }
+.grid--3 .card__media img { max-height: 50mm; max-width: 80%; }
+.grid--3 .card__body { padding: 6mm 7mm; align-self: center; }
+.grid--3 .card h3 { font-size: 16pt; }
+
+/* Cierre */
+.custom { border-radius: 8mm; padding: 10mm; background: linear-gradient(110deg,#c7a4ff,#a8e0ec,#f1e2b4); margin-bottom: 9mm; }
+.custom h2 { font-size: 24pt; margin-bottom: 3mm; }
+.custom p { margin: 0; font-size: 11pt; line-height: 1.45; color: #1a1a22; }
+.contact { border-radius: 8mm; padding: 10mm; background: #000; color: #fff; }
+.contact h2 { font-size: 24pt; margin-bottom: 6mm; }
+.contact .rows { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5mm 8mm; }
+.contact .label { font-size: 7.5pt; text-transform: uppercase; letter-spacing: .12em; opacity: .6; margin-bottom: 1mm; }
+.contact .value { font-size: 12pt; }
+.contact a { color: #fff; text-decoration: none; }
+.ask { margin: 8mm 0 0; font-size: 10.5pt; }
+.legal { margin-top: auto; font-size: 7.5pt; color: #6a6a74; }
+.badges { display: flex; align-items: center; gap: 7mm; margin: 8mm 0 5mm; font-size: 8pt; color: #5c5c66; }
+.badges img { height: 13mm; }
+</style></head><body>
+<section class="page cover">
+	<div class="cover__bg"></div>
+	<div class="cover__edition">B2B CATALOGUE · 2026</div>
+	<div class="cover__card">
+		<div class="cover__brand"><img src="../docs/assets/img/votumlabs-fav.svg" alt="">Votum Labs</div>
+		<h1>B2B Catalogue</h1>
+		<p>Dermopharmaceutical CBD products for pharmacies, distributors and professionals</p>
+	</div>
+</section>
+<section class="page">
+	<p class="eyebrow">Votum Labs</p>
+	<h2 class="section">About us</h2>
+	<p class="lead">VOTUM LABS is a biotechnology laboratory specialising in advanced therapeutic solutions based on cutting-edge active ingredients, with an end-to-end approach that runs from formulation to the preclinical validation of its products.</p>
+	<div class="facts"><div class="fact"><strong>2021</strong><span>Year founded</span></div><div class="fact"><strong>B Corp</strong><span>Certified company</span></div><div class="fact"><strong>Lorquí</strong><span>Murcia, Spain</span></div></div>
+	<h2 class="section">How we work</h2>
+	<div class="steps"><div class="step"><h3>Research</h3><p>Cutting-edge active ingredients and high-purity bioactive compounds.</p></div><div class="step"><h3>Molecular design</h3><p>Formulation built around each care and wellbeing goal.</p></div><div class="step"><h3>Galenic development</h3><p>Oils, balms, creams and topicals with progressive-release technologies.</p></div><div class="step"><h3>Functional validation</h3><p>Preclinical validation before reaching the pharmacy and the consumer.</p></div></div>
+	<div class="brands-block">
+		<p class="eyebrow">Our brands</p>
+		<div class="brands">
+			<div class="brand"><img src="../docs/assets/img/SOS-LOGO-ROJO.png" alt="SOS Pets"></div>
+			<div class="brand"><img src="../docs/assets/img/logo-cronidol.svg" alt="Cronidol"></div>
+			<div class="brand"><img src="../docs/assets/img/vezelay-logo.svg" alt="Vezelay Lab"></div>
+		</div>
+	</div>
+	<div class="folio"><span>Votum Labs · B2B Catalogue 2026</span><span>Page 2</span></div>
+</section>
+<section class="page">
+	<div class="line-head"><div class="line-orb" style="background:linear-gradient(135deg,#9a7be6,#5fb7e6 55%,#a8e0ec)"></div>
+		<div><p class="eyebrow">B2B Catalogue · votumlabs.com</p><h2>V. Sport</h2><p>Muscle recovery and activation with CBD. Four topical formulas with 2000 mg Full Spectrum and less than 0.2% THC.</p></div></div>
+	<div class="grid"><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#9a7be6,#5fb7e6 55%,#a8e0ec)"><img src="../docs/assets/img/productos/thera-pain-balm.webp" alt=""></div><div class="card__body"><h3>Thera.Pain Balm</h3><p class="claim">CBD balm for muscles and joints.</p><dl><dt>Format</dt><dd>100 ml jar</dd><dt>Active</dt><dd>2000 mg Full Spectrum (CBD, CBG, CBN, CBC)</dd><dt>Ingredients</dt><dd>Organic coconut oil, lavender, eucalyptus, beeswax and essential oils.</dd><dt>Use</dt><dd>Apply to clean, dry skin and massage until absorbed; 3–4 times a day.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#9a7be6,#5fb7e6 55%,#a8e0ec)"><img src="../docs/assets/img/productos/muscle-ice-cream.webp" alt=""></div><div class="card__body"><h3>Muscle.Ice Cream</h3><p class="claim">Cooling cream for after training.</p><dl><dt>Format</dt><dd>100 ml tube</dd><dt>Active</dt><dd>2000 mg Full Spectrum (CBD, CBG, CBN, CBC)</dd><dt>Ingredients</dt><dd>Organic coconut oil, avocado oil, vitamin E and menthol. Vegan.</dd><dt>Use</dt><dd>After physical activity, on tired areas.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#9a7be6,#5fb7e6 55%,#a8e0ec)"><img src="../docs/assets/img/productos/muscle-warm-cream.webp" alt=""></div><div class="card__body"><h3>Muscle.Warm Cream</h3><p class="claim">Warming cream to activate muscles before training.</p><dl><dt>Format</dt><dd>100 ml tube</dd><dt>Active</dt><dd>2000 mg Full Spectrum (CBD, CBG, CBN, CBC)</dd><dt>Ingredients</dt><dd>Organic coconut oil, avocado oil, vitamin E and methyl nicotinate. Vegan.</dd><dt>Use</dt><dd>Before exercise, on the areas to activate.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#9a7be6,#5fb7e6 55%,#a8e0ec)"><img src="../docs/assets/img/productos/muscle-recovery-cream.webp" alt=""></div><div class="card__body"><h3>Muscle.Recovery Cream</h3><p class="claim">Recovery cream for after exercise.</p><dl><dt>Format</dt><dd>100 ml tube</dd><dt>Active</dt><dd>2000 mg Full Spectrum (CBD, CBG, CBN, CBC)</dd><dt>Ingredients</dt><dd>Organic coconut oil, avocado oil, vitamin E, camphor and arnica.</dd><dt>Use</dt><dd>After exercise, on areas with muscle fatigue.</dd></dl></div></article></div>
+	<div class="folio"><span>Votum Labs · B2B Catalogue 2026</span><span>Page 3</span></div>
+</section>
+<section class="page">
+	<div class="line-head"><div class="line-orb" style="background:linear-gradient(135deg,#f1e2b4,#b9c6f0 50%,#9a7be6)"></div>
+		<div><p class="eyebrow">B2B Catalogue · votumlabs.com</p><h2>V. Liquids</h2><p>CBD drops to sleep, focus and find balance. 30 ml bottles with an anatomical dropper and adjustable dose.</p></div></div>
+	<div class="grid"><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#f1e2b4,#b9c6f0 50%,#9a7be6)"><img src="../docs/assets/img/productos/sleep-drops-oil.webp" alt=""></div><div class="card__body"><h3>Sleep.Drops Oil</h3><p class="claim">CBD oil for a bedtime routine.</p><dl><dt>Format</dt><dd>30 ml dropper bottle</dd><dt>Active</dt><dd>Up to 9000 mg Full Spectrum (CBD, CBG, CBN), &lt; 0.2% THC</dd><dt>Ingredients</dt><dd>Organic MCT oil, mint extract and melatonin. Vegan.</dd><dt>Use</dt><dd>Sublingual: hold for 30–40 s before swallowing, at bedtime.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#f1e2b4,#b9c6f0 50%,#9a7be6)"><img src="../docs/assets/img/productos/focus-drops-oil.webp" alt=""></div><div class="card__body"><h3>Focus.Drops Oil</h3><p class="claim">CBD oil for intense study or work days.</p><dl><dt>Format</dt><dd>30 ml dropper bottle</dd><dt>Active</dt><dd>Up to 3000 mg Broad Spectrum</dd><dt>Use</dt><dd>Sublingual, adjustable dose.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#f1e2b4,#b9c6f0 50%,#9a7be6)"><img src="../docs/assets/img/productos/intimate-drops-oil.webp" alt=""></div><div class="card__body"><h3>Intimate.Drops Oil</h3><p class="claim">CBD oil with cinnamon for the menstrual cycle.</p><dl><dt>Format</dt><dd>30 ml dropper bottle</dd><dt>Active</dt><dd>Up to 3000 mg Full Spectrum (CBD, CBG, CBN), &lt; 0.2% THC</dd><dt>Ingredients</dt><dd>Organic MCT oil and cinnamon extract. Vegan.</dd><dt>Use</dt><dd>Sublingual, 1–2 times a day, before and during the period.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#f1e2b4,#b9c6f0 50%,#9a7be6)"><img src="../docs/assets/img/productos/balance-drops-oil.webp" alt=""></div><div class="card__body"><h3>Balance.Drops Oil</h3><p class="claim">THC-free CBD oil for everyday balance.</p><dl><dt>Format</dt><dd>30 ml dropper bottle</dd><dt>Active</dt><dd>Up to 9000 mg Broad Spectrum, THC-free</dd><dt>Ingredients</dt><dd>Organic MCT oil.</dd><dt>Use</dt><dd>Sublingual, 1–2 times a day.</dd></dl></div></article></div>
+	<div class="folio"><span>Votum Labs · B2B Catalogue 2026</span><span>Page 4</span></div>
+</section>
+<section class="page">
+	<div class="line-head"><div class="line-orb" style="background:linear-gradient(135deg,#ffb4a8,#f1e2b4 55%,#a8e0ec)"></div>
+		<div><p class="eyebrow">B2B Catalogue · sospets.es</p><h2>SOS Pets</h2><p>CBD wellbeing for dogs and cats, with natural ingredients and cyclodextrin technology for faster absorption.</p></div></div>
+	<div class="grid grid--3"><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#ffb4a8,#f1e2b4 55%,#a8e0ec)"><img src="../docs/assets/img/productos/sos-spray.webp" alt=""></div><div class="card__body"><h3>SOS Spray</h3><p class="claim">Calming spray for stressful moments: fireworks, travel or vet visits.</p><dl><dt>Format</dt><dd>Spray</dd><dt>Use</dt><dd>Dogs and cats of all ages and sizes.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#ffb4a8,#f1e2b4 55%,#a8e0ec)"><img src="../docs/assets/img/productos/sos-aceite.webp" alt=""></div><div class="card__body"><h3>SOS Oil</h3><p class="claim">Oil for everyday wellbeing during changes or unusual situations.</p><dl><dt>Format</dt><dd>Dropper bottle; also available with salmon</dd><dt>Use</dt><dd>Dogs and cats.</dd></dl></div></article><article class="card"><div class="card__media" style="--grad:linear-gradient(135deg,#ffb4a8,#f1e2b4 55%,#a8e0ec)"><img src="../docs/assets/img/productos/sos-dol.webp" alt=""></div><div class="card__body"><h3>SOS Dol</h3><p class="claim">Massage cream for targeted care.</p><dl><dt>Format</dt><dd>5 ml dispenser tube</dd><dt>Active</dt><dd>330 mg Broad Spectrum (CBD, CBG, CBN) + 170 mg arnica</dd><dt>Use</dt><dd>Each click dispenses 0.05 ml, suitable for 5 kg of body weight.</dd></dl></div></article></div>
+	<div class="folio"><span>Votum Labs · B2B Catalogue 2026</span><span>Page 5</span></div>
+</section>
+<section class="page">
+	<div class="custom"><p class="eyebrow">B2B</p><h2>Bespoke development</h2><p>Research, molecular design, galenic development and functional validation within a single scientific ecosystem. Tell us about your project: we formulate, develop and validate dermopharmaceutical products for your brand or channel.</p></div>
+	<div class="contact">
+		<h2>Trade enquiries</h2>
+		<div class="rows">
+			<div><div class="label">Email</div><div class="value"><a href="mailto:info@votumlabs.com">info@votumlabs.com</a></div></div>
+			<div><div class="label">Tel. / WhatsApp</div><div class="value"><a href="https://wa.me/+34633862669">+34 633 86 26 69</a></div></div>
+			<div><div class="label">Hours</div><div class="value">Monday to Friday, 9:00 – 18:00 (CET)</div></div>
+			<div><div class="label">Web</div><div class="value"><a href="https://votumlabs.com">votumlabs.com</a> · <a href="https://sospets.es">sospets.es</a></div></div>
+			<div style="grid-column:1/-1"><div class="label">Address</div><div class="value">Calle Río Turia 1, 30564 Lorquí, Murcia, Spain</div></div>
+		</div>
+	</div>
+	<p class="ask">Technical data sheets, certificates of analysis, formats and trade terms available on request.</p>
+	<div class="badges"><img src="../docs/assets/img/LogoESPTagESP_Estandares_Negro-1.png" alt="B Corp"><span>Certified B Corporation</span></div>
+	<p class="legal">Indicative information based on the product pages published on votumlabs.com and sospets.es (October 2026). Images may not reflect current packaging.</p>
+	<div class="folio"><span>Votum Labs · B2B Catalogue 2026</span><span>Page 6</span></div>
+</section>
+</body></html>

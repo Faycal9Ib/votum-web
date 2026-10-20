@@ -23,10 +23,10 @@ PAGES_SRC = ROOT / 'paginas'
 THEME_DIR = ROOT.parent / 'wp-content' / 'themes' / 'orbita'
 THEME_PATH = 'wp-content/themes/orbita/'
 SITE_URL = 'https://faycal9ib.github.io/votum-web/'
-# Recursos hechos a mano (no vienen de WordPress): se conservan al regenerar docs/.
+# Recursos hechos a mano (no vienen de WordPress): se conservan al regenerar docs/. Admite carpetas.
 HANDMADE = [
     'brand.css', 'sections.css', 'assets/js/sections.js', 'assets/img/og-votumlabs.jpg',
-    'assets/fonts/inter-latin-wght-normal.woff2', 'assets/fonts/Inter-OFL.txt',
+    'assets/fonts', 'assets/img/productos', 'assets/catalogo',
 ]
 
 MENU = '''<ul id="ob-menu" class="ob-menu"><li class="menu-item"><a href="https://votumlabs.com/we-are-votum/" data-vt-decode="hover">We are Votum</a></li>
@@ -289,7 +289,11 @@ def build_pages():
 
 def copy_assets(html):
     used = set(re.findall(r'(?:src|href)=["\']((?:assets/[^"\'?]+)|style\.css)', html))
-    kept = {rel: (DOCS / rel).read_bytes() for rel in HANDMADE if (DOCS / rel).exists()}
+    kept = {}
+    for rel in HANDMADE:
+        path = DOCS / rel
+        files = [p for p in path.rglob('*') if p.is_file()] if path.is_dir() else [path] if path.exists() else []
+        kept.update({p.relative_to(DOCS).as_posix(): p.read_bytes() for p in files})
     if DOCS.exists():
         shutil.rmtree(DOCS)
     DOCS.mkdir()

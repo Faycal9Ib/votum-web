@@ -22,6 +22,19 @@ python export.py --paginas
 - **Compartir:** descripción y etiquetas Open Graph/Twitter en cada página, con `og-votumlabs.jpg` (1200×630). Si la web cambia de dominio, actualiza `SITE_URL` en `export.py`.
 - **404:** `docs/404.html`, que GitHub Pages sirve en cualquier ruta inexistente (sus enlaces van con ruta absoluta `/votum-web/`).
 
+## Catálogo B2B (PDF)
+
+- `catalogo/build.py` genera el catálogo en español e inglés (`docs/assets/catalogo/*.pdf`) con Chromium o Chrome:
+
+  ```bash
+  python catalogo/build.py          # HTML + PDF
+  python catalogo/build.py --html   # solo HTML, para revisarlo en el navegador
+  ```
+
+- Productos, textos y líneas están en las tablas `LINES` y `UI` de `catalogo/build.py`. Los datos salen de las fichas de votumlabs.com y sospets.es (octubre de 2026); las fotos están en `docs/assets/img/productos/`.
+- Sin afirmaciones de salud: solo formato, concentración, ingredientes y modo de uso. Fichas técnicas y condiciones profesionales, bajo petición.
+- La página B2B enlaza el PDF en la cabecera y en el bloque de contacto.
+
 ## Versión en inglés
 
 - Páginas en `docs/en/`: `index.html`, `b2b.html` e `investors.html`. Su contenido está en `paginas/en/`; la cabecera, el pie y el panel de accesibilidad se traducen con la tabla `EN_SHELL` de `export.py`.
