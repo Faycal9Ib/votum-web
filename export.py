@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parent
 DOCS = ROOT / 'docs'
 THEME_DIR = ROOT.parent / 'wp-content' / 'themes' / 'orbita'
 THEME_PATH = 'wp-content/themes/orbita/'
+# Páginas hechas a mano (no vienen de WordPress): se conservan al regenerar docs/.
+HANDMADE = ['b2b.html', 'inversores.html', 'sections.css', 'assets/js/sections.js']
 
 
 def fetch(url):
@@ -53,9 +55,13 @@ def clean_html(html, base):
 
 def copy_assets(html):
     used = set(re.findall(r'(?:src|href)=["\']((?:assets/[^"\'?]+)|style\.css)', html))
+    kept = {rel: (DOCS / rel).read_bytes() for rel in HANDMADE if (DOCS / rel).exists()}
     if DOCS.exists():
         shutil.rmtree(DOCS)
     DOCS.mkdir()
+    for rel, data in kept.items():
+        (DOCS / rel).parent.mkdir(parents=True, exist_ok=True)
+        (DOCS / rel).write_bytes(data)
     for rel in sorted(used):
         src = THEME_DIR / rel
         dst = DOCS / rel
