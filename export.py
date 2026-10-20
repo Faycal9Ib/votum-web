@@ -4,9 +4,13 @@ Uso (con WAMP arrancado):
     python export.py
     python export.py --base http://localhost/wordpress/
 
+Sin WordPress (solo rehace B2B, Área inversores y 404 a partir de docs/index.html):
+    python export.py --paginas
+
 Después: git add -A && git commit -m "Actualiza exportación" && git push
 """
 import argparse
+import html as htmllib
 import re
 import shutil
 import sys
@@ -15,10 +19,32 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 DOCS = ROOT / 'docs'
+PAGES_SRC = ROOT / 'paginas'
 THEME_DIR = ROOT.parent / 'wp-content' / 'themes' / 'orbita'
 THEME_PATH = 'wp-content/themes/orbita/'
-# Páginas hechas a mano (no vienen de WordPress): se conservan al regenerar docs/.
-HANDMADE = ['b2b.html', 'inversores.html', 'sections.css', 'assets/js/sections.js']
+SITE_URL = 'https://faycal9ib.github.io/votum-web/'
+# Recursos hechos a mano (no vienen de WordPress): se conservan al regenerar docs/.
+HANDMADE = [
+    'brand.css', 'sections.css', 'assets/js/sections.js', 'assets/img/og-votumlabs.jpg',
+    'assets/fonts/inter-latin-wght-normal.woff2', 'assets/fonts/Inter-OFL.txt',
+]
+
+MENU = '''<ul id="ob-menu" class="ob-menu"><li class="menu-item"><a href="https://votumlabs.com/we-are-votum/" data-vt-decode="hover">We are Votum</a></li>
+<li class="menu-item"><a href="b2b.html" data-vt-decode="hover">B2B</a></li>
+<li class="menu-item"><a href="inversores.html" data-vt-decode="hover">Área inversores</a></li>
+'''
+
+# slug -> (título, descripción, ¿usa sections.css y sections.js?)
+PAGES = {
+    'index': ('Votum Labs &#8211; Laboratorio biotecnológico',
+              'Laboratorio biotecnológico: soluciones dermofarmacéuticas con CBD, de la farmacia al consumidor.', False),
+    'b2b': ('B2B &#8211; Votum Labs',
+            'Líneas de producto y desarrollo dermofarmacéutico de Votum Labs para farmacias, distribuidores y profesionales.', True),
+    'inversores': ('Área inversores &#8211; Votum Labs',
+                   'Perfil corporativo, rondas de capital y portal del socio de Votum Labs.', True),
+    '404': ('Página no encontrada &#8211; Votum Labs',
+            'La página que buscas no existe en la web de Votum Labs.', False),
+}
 
 
 def fetch(url):
@@ -50,7 +76,92 @@ def clean_html(html, base):
     html = html.replace(base, './')
 
     leftovers = sorted(set(re.findall(r'localhost[^"\'\s<>)]*', html)))
-    return html, leftovers
+    return postprocess(html), leftovers
+
+
+def postprocess(html):
+    """Ajustes del sitio estático. Idempotente: se puede aplicar sobre un index.html ya procesado."""
+    # Estilos de bloques de WordPress que el tema no usa, y la precarga de rutas /wordpress/.
+    for style_id in ('wp-img-auto-sizes-contain-inline-css', 'wp-block-library-inline-css',
+                     'classic-theme-styles-inline-css', 'global-styles-inline-css'):
+        html = re.sub(rf'\s*<style id="{style_id}">.*?</style>', '', html, flags=re.S)
+    html = re.sub(r'\s*<script type="speculationrules">.*?</script>', '', html, flags=re.S)
+
+    # Menú superior y enlaces del pie hacia las páginas propias.
+    start = html.index('<ul id="ob-menu" class="ob-menu">')
+    end = html.index('</ul>', html.index('</li>', start))
+    while html.count('<ul', start + 1, end) > html.count('</ul>', start, end):  # submenús anidados
+        end = html.index('</ul>', end + 1)
+    html = html[:start] + MENU + html[end:]
+    html = html.replace('<a href="https://votumlabs.com/b2b/">B2B</a>', '<a href="b2b.html">B2B</a>')
+    html = html.replace('<a href="https://votumlabs.com/investor-relations/">Investor Relations</a>',
+                        '<a href="inversores.html">Área inversores</a>')
+
+    # Tipografía de marca.
+    if 'votum-brand-css' not in html:
+        html = re.sub(r"(<link rel='stylesheet' id='orbita-css'[^>]*>)",
+                      r"\1\n<link rel='stylesheet' id='votum-brand-css' href='brand.css?ver=1.0.0' media='all' />", html, count=1)
+    return html
+
+
+def page_head(head, slug):
+    """Título, descripción y etiquetas para compartir (Open Graph / Twitter) de cada página."""
+    title, desc, own_assets = PAGES[slug]
+    url = SITE_URL + ('' if slug == 'index' else f'{slug}.html')
+    plain = htmllib.unescape(title)
+    meta = (
+        '<!-- votum:meta -->\n'
+        f'\t<meta name="description" content="{desc}">\n'
+        f'\t<meta property="og:type" content="website">\n'
+        f'\t<meta property="og:site_name" content="Votum Labs">\n'
+        f'\t<meta property="og:locale" content="es_ES">\n'
+        f'\t<meta property="og:title" content="{plain}">\n'
+        f'\t<meta property="og:description" content="{desc}">\n'
+        f'\t<meta property="og:url" content="{url}">\n'
+        f'\t<meta property="og:image" content="{SITE_URL}assets/img/og-votumlabs.jpg">\n'
+        f'\t<meta property="og:image:width" content="1200">\n'
+        f'\t<meta property="og:image:height" content="630">\n'
+        f'\t<meta property="og:image:alt" content="Votum Labs, laboratorio biotecnológico: ciencia que llega de la farmacia al consumidor">\n'
+        f'\t<meta name="twitter:card" content="summary_large_image">\n'
+        '\t<!-- /votum:meta -->'
+    )
+    head = re.sub(r'\s*<!-- votum:meta -->.*?<!-- /votum:meta -->', '', head, flags=re.S)
+    head = re.sub(r'<title>.*?</title>', lambda m: f'<title>{title}</title>\n\t{meta}', head, count=1, flags=re.S)
+    if own_assets:
+        head = head.replace("href='brand.css?ver=1.0.0' media='all' />",
+                            "href='brand.css?ver=1.0.0' media='all' />\n<link rel='stylesheet' id='votum-sections-css' href='sections.css?ver=1.0.0' media='all' />")
+    return head
+
+
+def root_relative(html):
+    """La 404 se sirve en cualquier ruta: sus enlaces relativos pasan a absolutos desde la raíz del sitio."""
+    root = '/' + SITE_URL.split('/', 3)[3]
+    return re.sub(r'''((?:href|src)=["'])(?![a-z][a-z0-9+.-]*:|/|#)''', rf'\g<1>{root}', html)
+
+
+def build_pages():
+    """Genera index (cabecera y metadatos), b2b, inversores y 404 a partir de docs/index.html."""
+    index = postprocess((DOCS / 'index.html').read_text(encoding='utf-8'))
+    head, rest = index.split('</head>', 1)
+    body_open = rest[:rest.index('<main')]
+    main = rest[rest.index('<main'):rest.index('</main>') + len('</main>')]
+    tail = rest[rest.index('</main>') + len('</main>'):]
+
+    for slug, (_, _, own_assets) in PAGES.items():
+        h = page_head(head, slug)
+        if slug == 'index':
+            out = h + '</head>' + body_open + main + tail
+        else:
+            b = body_open.replace('<body class="home blog wp-theme-orbita">', f'<body class="page page-{slug} wp-theme-orbita">')
+            b = b.replace(f'<a href="{slug}.html" data-vt-decode="hover">', f'<a href="{slug}.html" data-vt-decode="hover" aria-current="page">')
+            t = tail
+            if own_assets:
+                t = t.replace('</body>', '<script defer id="votum-sections-js" src="assets/js/sections.js?ver=1.0.0"></script>\n</body>')
+            out = h + '</head>' + b + (PAGES_SRC / f'{slug}.html').read_text(encoding='utf-8').rstrip('\n') + t
+            if slug == '404':
+                out = root_relative(out)
+        (DOCS / f'{slug}.html').write_text(out, encoding='utf-8')
+    print('docs/:', ', '.join(f'{s}.html' for s in PAGES))
 
 
 def copy_assets(html):
@@ -73,12 +184,18 @@ def copy_assets(html):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--base', default='http://localhost/wordpress/')
-    base = ap.parse_args().base.rstrip('/') + '/'
+    ap.add_argument('--paginas', action='store_true', help='solo rehacer las páginas desde docs/index.html (sin WordPress)')
+    args = ap.parse_args()
+    if args.paginas:
+        build_pages()
+        return
+    base = args.base.rstrip('/') + '/'
 
     html, leftovers = clean_html(fetch(base), base)
     used = copy_assets(html)
     (DOCS / 'index.html').write_text(html, encoding='utf-8')
     (DOCS / '.nojekyll').write_text('', encoding='utf-8')  # GitHub Pages: servir tal cual, sin Jekyll
+    build_pages()
 
     print(f'docs/index.html ({len(html)} bytes) + {len(used)} recursos')
     if leftovers:

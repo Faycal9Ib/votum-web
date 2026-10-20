@@ -1,0 +1,28 @@
+/*
+Tipografía de marca para todas las páginas (la enlaza export.py después de style.css).
+En Apple se usa la fuente del sistema (SF Pro); en el resto, Inter alojada aquí mismo
+(SIL Open Font License 1.1, ver assets/fonts/Inter-OFL.txt). Sin Google Fonts ni terceros.
+*/
+@font-face {
+	font-family: "Inter";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("assets/fonts/inter-latin-wght-normal.woff2") format("woff2");
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+	--ob-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
+	--ob-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+/* Inter es algo más ancha que SF: se compensa en los titulares grandes. */
+h1, h2, h3, h4, .ob-unit__headline, .ob-footer__title { letter-spacing: -.025em; }
+
+/* ---------- Página 404 ---------- */
+.vt-404 { min-height: min(78vh, 680px); }
+.vt-404 .ob-unit__copy { text-shadow: 0 1px 14px rgba(40, 30, 90, .35); }
+.vt-404 .ob-btn--secondary { background: rgba(255, 255, 255, .16); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.vt-404 .ob-unit__subhead { font-size: 18px; text-transform: uppercase; letter-spacing: .1em; opacity: .85; margin: 0 0 12px; }
+.vt-404__text { font-size: 20px; margin: 16px auto 0; max-width: 560px; opacity: .9; }
+.a11y-contrast .vt-404 .ob-unit__copy { background: #000; color: #fff; padding: 24px 28px; border-radius: 20px; max-width: 900px; margin: 0 auto; }

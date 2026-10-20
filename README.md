@@ -5,11 +5,22 @@ No es la web oficial: los enlaces del menú y de productos apuntan a [votumlabs.
 
 - `docs/` — sitio publicado con GitHub Pages (HTML, CSS, JS e imágenes; sin WordPress ni base de datos).
 - `export.py` — regenera `docs/` desde el WordPress local.
-- `docs/b2b.html`, `docs/inversores.html`, `docs/sections.css`, `docs/assets/js/sections.js` — páginas **B2B** y **Área inversores**, hechas a mano (no salen de WordPress). `export.py` las conserva al regenerar.
+- `paginas/` — contenido (`<main>`) de **B2B**, **Área inversores** y la **404**. `export.py` las monta con la cabecera y el pie de la portada.
+- `docs/brand.css`, `docs/sections.css`, `docs/assets/js/sections.js`, `docs/assets/fonts/`, `docs/assets/img/og-votumlabs.jpg` — recursos hechos a mano; `export.py` los conserva al regenerar.
 
-## Menú
+Para rehacer las páginas sin WordPress (por ejemplo, tras editar algo en `paginas/`):
 
-El menú superior es **We are Votum · B2B · Área inversores**. Está editado en `docs/index.html` y copiado en las dos páginas nuevas; si vuelves a exportar desde WordPress, cambia también el menú allí (Apariencia → Menús) o la exportación lo sobrescribirá.
+```bash
+python export.py --paginas
+```
+
+## Qué añade export.py a lo que sale de WordPress
+
+- **Menú:** siempre **We are Votum · B2B · Área inversores** (aunque WordPress tenga otro), y en el pie «B2B» y «Área inversores» apuntan a las páginas propias.
+- **Limpieza:** quita los estilos de bloques de WordPress que el tema no usa (la portada pasa de ~34 KB a ~18 KB).
+- **Tipografía:** `brand.css` usa la fuente del sistema en Apple (SF Pro) e **Inter** en el resto, alojada en `docs/assets/fonts/` (licencia SIL OFL 1.1). Sin Google Fonts.
+- **Compartir:** descripción y etiquetas Open Graph/Twitter en cada página, con `og-votumlabs.jpg` (1200×630). Si la web cambia de dominio, actualiza `SITE_URL` en `export.py`.
+- **404:** `docs/404.html`, que GitHub Pages sirve en cualquier ruta inexistente (sus enlaces van con ruta absoluta `/votum-web/`).
 
 ## Área inversores: acceso de socios
 
