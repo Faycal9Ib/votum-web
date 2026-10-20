@@ -4,7 +4,7 @@ Uso (con WAMP arrancado):
     python export.py
     python export.py --base http://localhost/wordpress/
 
-Sin WordPress (solo rehace B2B, Área inversores y 404 a partir de docs/index.html):
+Sin WordPress (solo rehace las páginas en español e inglés a partir de docs/index.html):
     python export.py --paginas
 
 Después: git add -A && git commit -m "Actualiza exportación" && git push
@@ -34,17 +34,84 @@ MENU = '''<ul id="ob-menu" class="ob-menu"><li class="menu-item"><a href="https:
 <li class="menu-item"><a href="inversores.html" data-vt-decode="hover">Área inversores</a></li>
 '''
 
-# slug -> (título, descripción, ¿usa sections.css y sections.js?)
+# Páginas: archivo en español, archivo en inglés (None = solo español), si usan sections.css/js,
+# y título y descripción por idioma. La portada en español sale de WordPress; el resto, de paginas/.
 PAGES = {
-    'index': ('Votum Labs &#8211; Laboratorio biotecnológico',
-              'Laboratorio biotecnológico: soluciones dermofarmacéuticas con CBD, de la farmacia al consumidor.', False),
-    'b2b': ('B2B &#8211; Votum Labs',
-            'Líneas de producto y desarrollo dermofarmacéutico de Votum Labs para farmacias, distribuidores y profesionales.', True),
-    'inversores': ('Área inversores &#8211; Votum Labs',
-                   'Perfil corporativo, rondas de capital y portal del socio de Votum Labs.', True),
-    '404': ('Página no encontrada &#8211; Votum Labs',
-            'La página que buscas no existe en la web de Votum Labs.', False),
+    'index': {
+        'es': 'index.html', 'en': 'index.html', 'sections': False,
+        'meta': {
+            'es': ('Votum Labs &#8211; Laboratorio biotecnológico',
+                   'Laboratorio biotecnológico: soluciones dermofarmacéuticas con CBD, de la farmacia al consumidor.'),
+            'en': ('Votum Labs &#8211; Biotechnology laboratory',
+                   'Biotechnology laboratory: dermopharmaceutical CBD solutions, from the pharmacy to the consumer.'),
+        },
+    },
+    'b2b': {
+        'es': 'b2b.html', 'en': 'b2b.html', 'sections': True,
+        'meta': {
+            'es': ('B2B &#8211; Votum Labs',
+                   'Líneas de producto y desarrollo dermofarmacéutico de Votum Labs para farmacias, distribuidores y profesionales.'),
+            'en': ('B2B &#8211; Votum Labs',
+                   'Votum Labs product lines and dermopharmaceutical development for pharmacies, distributors and professionals.'),
+        },
+    },
+    'inversores': {
+        'es': 'inversores.html', 'en': 'investors.html', 'sections': True,
+        'meta': {
+            'es': ('Área inversores &#8211; Votum Labs',
+                   'Perfil corporativo, rondas de capital y portal del socio de Votum Labs.'),
+            'en': ('Investors &#8211; Votum Labs',
+                   'Company profile, funding rounds and shareholder portal of Votum Labs.'),
+        },
+    },
+    '404': {
+        'es': '404.html', 'en': None, 'sections': False,
+        'meta': {'es': ('Página no encontrada &#8211; Votum Labs', 'La página que buscas no existe en la web de Votum Labs.')},
+    },
 }
+
+# Cabecera, pie y panel de accesibilidad en inglés. Cada texto debe existir en la portada:
+# si WordPress lo cambia, la exportación avisa en lugar de dejarlo a medias.
+EN_SHELL = [
+    ('<html lang="es">', '<html lang="en">'),
+    ('>Saltar al contenido<', '>Skip to content<'),
+    ('aria-label="Buscar"', 'aria-label="Search"'),
+    ('>Buscar</label>', '>Search</label>'),
+    ('aria-label="Mi cuenta"', 'aria-label="My account"'),
+    ('aria-label="Tienda"', 'aria-label="Shop"'),
+    ('aria-label="Menú"', 'aria-label="Menu"'),
+    ('href="inversores.html"', 'href="investors.html"'),
+    ('>Área inversores<', '>Investors<'),
+    ('Somos B Corp: una de las 280 empresas reconocidas en España.', 'We are a B Corp: one of 280 certified companies in Spain.'),
+    ('>Descúbrelo<', '>Find out more<'),
+    ('aria-label="Pie de página"', 'aria-label="Footer"'),
+    ('>Política de envíos, devoluciones y cancelación de pedidos<', '>Shipping, returns and cancellation policy<'),
+    ('>Todas las noticias<', '>All news<'),
+    ('>Somos B Corp<', '>We are a B Corp<'),
+    ('>¿Qué es el CBD?<', '>What is CBD?<'),
+    ('Lorquí, Murcia, España', 'Lorquí, Murcia, Spain'),
+    ('>Síguenos<', '>Follow us<'),
+    ('alt="Empresa B Corp certificada"', 'alt="Certified B Corporation"'),
+    ('>Proyecto financiado por:<', '>Project funded by:<'),
+    ('Todos los derechos reservados.', 'All rights reserved.'),
+    ('>Política de privacidad<', '>Privacy policy<'),
+    ('>Política de cookies<', '>Cookie policy<'),
+    ('>Política de igualdad<', '>Equality policy<'),
+    ('>Política de calidad<', '>Quality policy<'),
+    ('>Aviso legal<', '>Legal notice<'),
+    ('>Opciones de accesibilidad<', '>Accessibility options<'),
+    ('>Accesibilidad<', '>Accessibility<'),
+    ('aria-label="Tamaño del texto"', 'aria-label="Text size"'),
+    ('<span>Tamaño del texto</span>', '<span>Text size</span>'),
+    ('aria-label="Texto normal"', 'aria-label="Normal text"'),
+    ('aria-label="Texto grande"', 'aria-label="Large text"'),
+    ('aria-label="Texto muy grande"', 'aria-label="Extra large text"'),
+    ('>Alto contraste<', '>High contrast<'),
+    ('>Subrayar enlaces<', '>Underline links<'),
+    ('>Fuente legible<', '>Readable font<'),
+    ('>Detener animaciones<', '>Stop animations<'),
+    ('>Restablecer<', '>Reset<'),
+]
 
 
 def fetch(url):
@@ -104,33 +171,76 @@ def postprocess(html):
     return html
 
 
-def page_head(head, slug):
-    """Título, descripción y etiquetas para compartir (Open Graph / Twitter) de cada página."""
-    title, desc, own_assets = PAGES[slug]
-    url = SITE_URL + ('' if slug == 'index' else f'{slug}.html')
+def page_url(slug, lang):
+    name = PAGES[slug][lang]
+    path = '' if name == 'index.html' else name
+    return SITE_URL + ('en/' if lang == 'en' else '') + path
+
+
+def page_head(head, slug, lang):
+    """Título, descripción, idiomas alternativos y etiquetas para compartir de cada página."""
+    page = PAGES[slug]
+    title, desc = page['meta'][lang]
     plain = htmllib.unescape(title)
-    meta = (
-        '<!-- votum:meta -->\n'
-        f'\t<meta name="description" content="{desc}">\n'
-        f'\t<meta property="og:type" content="website">\n'
-        f'\t<meta property="og:site_name" content="Votum Labs">\n'
-        f'\t<meta property="og:locale" content="es_ES">\n'
-        f'\t<meta property="og:title" content="{plain}">\n'
-        f'\t<meta property="og:description" content="{desc}">\n'
-        f'\t<meta property="og:url" content="{url}">\n'
-        f'\t<meta property="og:image" content="{SITE_URL}assets/img/og-votumlabs.jpg">\n'
-        f'\t<meta property="og:image:width" content="1200">\n'
-        f'\t<meta property="og:image:height" content="630">\n'
-        f'\t<meta property="og:image:alt" content="Votum Labs, laboratorio biotecnológico: ciencia que llega de la farmacia al consumidor">\n'
-        f'\t<meta name="twitter:card" content="summary_large_image">\n'
-        '\t<!-- /votum:meta -->'
-    )
+    alt = 'Votum Labs, biotechnology laboratory: science that goes from the pharmacy to the consumer' if lang == 'en' else \
+        'Votum Labs, laboratorio biotecnológico: ciencia que llega de la farmacia al consumidor'
+    lines = [f'<meta name="description" content="{desc}">']
+    if page['en']:
+        lines += [f'<link rel="alternate" hreflang="es" href="{page_url(slug, "es")}">',
+                  f'<link rel="alternate" hreflang="en" href="{page_url(slug, "en")}">',
+                  f'<link rel="alternate" hreflang="x-default" href="{page_url(slug, "es")}">']
+    lines += [
+        '<meta property="og:type" content="website">',
+        '<meta property="og:site_name" content="Votum Labs">',
+        f'<meta property="og:locale" content="{"en_GB" if lang == "en" else "es_ES"}">',
+    ]
+    if page['en']:
+        lines.append(f'<meta property="og:locale:alternate" content="{"es_ES" if lang == "en" else "en_GB"}">')
+    lines += [
+        f'<meta property="og:title" content="{plain}">',
+        f'<meta property="og:description" content="{desc}">',
+        f'<meta property="og:url" content="{page_url(slug, lang)}">',
+        f'<meta property="og:image" content="{SITE_URL}assets/img/og-votumlabs.jpg">',
+        '<meta property="og:image:width" content="1200">',
+        '<meta property="og:image:height" content="630">',
+        f'<meta property="og:image:alt" content="{alt}">',
+        '<meta name="twitter:card" content="summary_large_image">',
+    ]
+    meta = '<!-- votum:meta -->\n\t' + '\n\t'.join(lines) + '\n\t<!-- /votum:meta -->'
     head = re.sub(r'\s*<!-- votum:meta -->.*?<!-- /votum:meta -->', '', head, flags=re.S)
     head = re.sub(r'<title>.*?</title>', lambda m: f'<title>{title}</title>\n\t{meta}', head, count=1, flags=re.S)
-    if own_assets:
+    if page['sections']:
         head = head.replace("href='brand.css?ver=1.0.0' media='all' />",
                             "href='brand.css?ver=1.0.0' media='all' />\n<link rel='stylesheet' id='votum-sections-css' href='sections.css?ver=1.0.0' media='all' />")
     return head
+
+
+def lang_switcher(html, slug, lang):
+    """Selector de idioma: el idioma actual marcado y el otro enlazado a la misma página."""
+    page = PAGES[slug]
+    es_item = '<span class="ob-lang__item is-current" aria-current="true" lang="es">Español</span>'
+    en_item = '<span class="ob-lang__item is-current" aria-current="true" lang="en">English</span>'
+    if lang == 'es' and page['en']:
+        en_item = f'<a class="ob-lang__item" href="en/{"" if page["en"] == "index.html" else page["en"]}" lang="en" hreflang="en">English</a>'
+    elif lang == 'es':
+        en_item = '<a class="ob-lang__item" href="en/" lang="en" hreflang="en">English</a>'
+    else:
+        es_item = f'<a class="ob-lang__item" href="../{"" if page["es"] == "index.html" else page["es"]}" lang="es" hreflang="es">Español</a>'
+    items = f'\n\t\t\t<li>{es_item}</li>\n\t\t\t<li>{en_item}</li>\n\t\t'
+    html = re.sub(r'(<ul class="ob-lang__list" id="ob-lang-list" hidden>).*?(</ul>)', lambda m: m.group(1) + items + m.group(2), html, count=1, flags=re.S)
+    if lang == 'en':
+        html = html.replace('<span class="screen-reader-text">Idioma: Español</span>', '<span class="screen-reader-text">Language: English</span>')
+        html = html.replace('<span class="ob-lang__code" aria-hidden="true">ES</span>', '<span class="ob-lang__code" aria-hidden="true">EN</span>')
+    return html
+
+
+def to_english(html):
+    for es, en in EN_SHELL:
+        if es not in html:
+            raise SystemExit(f'Traducción: no se encuentra «{es}» en la portada. Actualiza EN_SHELL en export.py.')
+        html = html.replace(es, en)
+    # Las páginas en inglés viven en docs/en/: los recursos compartidos están un nivel más arriba.
+    return re.sub(r'''((?:href|src)=["'])(assets/|style\.css|brand\.css|sections\.css)''', r'\1../\2', html)
 
 
 def root_relative(html):
@@ -140,28 +250,41 @@ def root_relative(html):
 
 
 def build_pages():
-    """Genera index (cabecera y metadatos), b2b, inversores y 404 a partir de docs/index.html."""
+    """Genera las páginas en español e inglés a partir de docs/index.html y de paginas/."""
     index = postprocess((DOCS / 'index.html').read_text(encoding='utf-8'))
     head, rest = index.split('</head>', 1)
     body_open = rest[:rest.index('<main')]
     main = rest[rest.index('<main'):rest.index('</main>') + len('</main>')]
     tail = rest[rest.index('</main>') + len('</main>'):]
+    (DOCS / 'en').mkdir(exist_ok=True)
+    built = []
 
-    for slug, (_, _, own_assets) in PAGES.items():
-        h = page_head(head, slug)
-        if slug == 'index':
-            out = h + '</head>' + body_open + main + tail
-        else:
-            b = body_open.replace('<body class="home blog wp-theme-orbita">', f'<body class="page page-{slug} wp-theme-orbita">')
-            b = b.replace(f'<a href="{slug}.html" data-vt-decode="hover">', f'<a href="{slug}.html" data-vt-decode="hover" aria-current="page">')
-            t = tail
-            if own_assets:
+    for slug, page in PAGES.items():
+        for lang in ('es', 'en'):
+            name = page[lang]
+            if not name:
+                continue
+            h = page_head(head, slug, lang)
+            b, t = body_open, tail
+            if slug != 'index':
+                b = b.replace('<body class="home blog wp-theme-orbita">', f'<body class="page page-{slug} wp-theme-orbita">')
+                b = b.replace(f'<a href="{page["es"]}" data-vt-decode="hover">', f'<a href="{page["es"]}" data-vt-decode="hover" aria-current="page">')
+            if page['sections']:
                 t = t.replace('</body>', '<script defer id="votum-sections-js" src="assets/js/sections.js?ver=1.0.0"></script>\n</body>')
-            out = h + '</head>' + b + (PAGES_SRC / f'{slug}.html').read_text(encoding='utf-8').rstrip('\n') + t
+            if slug == 'index' and lang == 'es':
+                content = main
+            else:
+                src = PAGES_SRC / ('en' if lang == 'en' else '') / name
+                content = src.read_text(encoding='utf-8').rstrip('\n')
+            out = lang_switcher(h + '</head>' + b + content + t, slug, lang)
+            if lang == 'en':
+                out = to_english(out)
             if slug == '404':
                 out = root_relative(out)
-        (DOCS / f'{slug}.html').write_text(out, encoding='utf-8')
-    print('docs/:', ', '.join(f'{s}.html' for s in PAGES))
+            dest = DOCS / ('en' if lang == 'en' else '') / name
+            dest.write_text(out, encoding='utf-8')
+            built.append(str(dest.relative_to(DOCS)))
+    print('docs/:', ', '.join(built))
 
 
 def copy_assets(html):

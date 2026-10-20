@@ -11,6 +11,20 @@
  */
 ( () => {
 	const doc = document.documentElement;
+	const EN = doc.lang.startsWith( 'en' );
+	const T = EN
+		? {
+			slide: 'slide', of: 'of', group: ( i, n ) => `Go to group ${ i } of ${ n }`, locale: 'en-GB',
+			missing: 'Enter your email and your PIN code.',
+			pending: 'Private access will be enabled once the portal is connected to a secure server. In the meantime, write to us at info@votumlabs.com.',
+			demoShow: 'See a demo of the dashboard', demoHide: 'Hide the demo',
+		}
+		: {
+			slide: 'diapositiva', of: 'de', group: ( i, n ) => `Ir al grupo ${ i } de ${ n }`, locale: 'es-ES',
+			missing: 'Introduce tu email y tu código PIN.',
+			pending: 'El acceso privado se activará cuando el portal esté conectado a un servidor seguro. Mientras tanto, escríbenos a info@votumlabs.com.',
+			demoShow: 'Ver una demostración del panel', demoHide: 'Ocultar la demostración',
+		};
 	const reduceMotion = () =>
 		doc.classList.contains( 'a11y-reduce-motion' ) || window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
@@ -25,8 +39,8 @@
 
 		slides.forEach( ( slide, i ) => {
 			slide.setAttribute( 'role', 'group' );
-			slide.setAttribute( 'aria-roledescription', 'diapositiva' );
-			slide.setAttribute( 'aria-label', `${ i + 1 } de ${ slides.length }` );
+			slide.setAttribute( 'aria-roledescription', T.slide );
+			slide.setAttribute( 'aria-label', `${ i + 1 } ${ T.of } ${ slides.length }` );
 		} );
 
 		const step = () => slides[ 1 ] ? slides[ 1 ].offsetLeft - slides[ 0 ].offsetLeft : track.clientWidth;
@@ -43,7 +57,7 @@
 					const dot = document.createElement( 'button' );
 					dot.type = 'button';
 					dot.className = 'vt-lines__dot';
-					dot.setAttribute( 'aria-label', `Ir al grupo ${ i + 1 } de ${ n }` );
+					dot.setAttribute( 'aria-label', T.group( i + 1, n ) );
 					dot.addEventListener( 'click', () => scrollToX( x ) );
 					return dot;
 				} )
@@ -80,7 +94,7 @@
 	const counters = document.querySelectorAll( '[data-vt-count]' );
 	const format = ( el, v ) => {
 		const decimals = Number( el.dataset.decimals || 0 );
-		el.textContent = v.toLocaleString( 'es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals } ) + ( el.dataset.suffix || '' );
+		el.textContent = ( el.dataset.prefix || '' ) + v.toLocaleString( T.locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals } ) + ( el.dataset.suffix || '' );
 	};
 	const animate = ( el ) => {
 		const to = Number( el.dataset.vtCount );
@@ -115,19 +129,19 @@
 		const email = form.elements.email.value.trim();
 		const pin = form.elements.pin.value.trim();
 		if ( ! email || ! pin ) {
-			status.textContent = 'Introduce tu email y tu código PIN.';
+			status.textContent = T.missing;
 			return;
 		}
 		// Sin servidor no hay validación segura posible: no se comprueba nada en el navegador.
 		form.reset();
-		status.textContent = 'El acceso privado se activará cuando el portal esté conectado a un servidor seguro. Mientras tanto, escríbenos a info@votumlabs.com.';
+		status.textContent = T.pending;
 	} );
 
 	demoBtn?.addEventListener( 'click', () => {
 		const open = panel.hidden;
 		panel.hidden = ! open;
 		demoBtn.setAttribute( 'aria-expanded', String( open ) );
-		demoBtn.textContent = open ? 'Ocultar la demostración' : 'Ver una demostración del panel';
+		demoBtn.textContent = open ? T.demoHide : T.demoShow;
 		if ( open ) {
 			panel.scrollIntoView( { behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' } );
 			panel.querySelector( 'h2' )?.focus( { preventScroll: true } );

@@ -22,6 +22,13 @@ python export.py --paginas
 - **Compartir:** descripción y etiquetas Open Graph/Twitter en cada página, con `og-votumlabs.jpg` (1200×630). Si la web cambia de dominio, actualiza `SITE_URL` en `export.py`.
 - **404:** `docs/404.html`, que GitHub Pages sirve en cualquier ruta inexistente (sus enlaces van con ruta absoluta `/votum-web/`).
 
+## Versión en inglés
+
+- Páginas en `docs/en/`: `index.html`, `b2b.html` e `investors.html`. Su contenido está en `paginas/en/`; la cabecera, el pie y el panel de accesibilidad se traducen con la tabla `EN_SHELL` de `export.py`.
+- El selector de idioma de la cabecera enlaza cada página con su equivalente, y cada página declara `hreflang` y `og:locale`.
+- La portada en inglés (`paginas/en/index.html`) es una traducción a mano: **si cambias textos de la portada en WordPress, actualízala también**. Si cambia algún texto de la cabecera o el pie, `export.py --paginas` se detiene y dice cuál falta en `EN_SHELL`.
+- Los textos de los scripts (carrusel, portal del socio) están en los dos idiomas en `docs/assets/js/sections.js` y se eligen según `<html lang>`.
+
 ## Área inversores: acceso de socios
 
 GitHub Pages solo sirve archivos estáticos, así que **no puede validar un login de forma segura**. El formulario de email + PIN no comprueba credenciales y el botón «Ver una demostración del panel» enseña el diseño con **datos ficticios**. No guardes datos reales de socios en este repositorio (ni en CSV ni en JSON): serían públicos. Para activar el portal real hace falta un servidor (por ejemplo, Supabase, un backend propio o el portal de Odoo) que valide el acceso y devuelva solo los datos del socio autenticado.

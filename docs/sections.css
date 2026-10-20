@@ -165,10 +165,21 @@ y portal del socio (thebeeminelab.org/socio/). Textos, datos e identidad visual 
 .vt-notice h3 { font-size: 22px; margin: 0 0 8px; }
 .vt-notice p { margin: 0; color: #333; font-size: 16px; }
 .vt-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ob-gutter); }
-.vt-kpi { border-radius: var(--ob-card-radius); background: var(--ob-bg-alt); padding: 24px; }
-.vt-kpi h3 { font: 600 14px/1.3 var(--ob-font); margin: 0 0 14px; color: var(--ob-text-muted); letter-spacing: 0; }
+/* Bloques de cifras: el degradado de marca de los enlaces (versión pastel, legible con texto negro),
+   desplazándose como en el brillo de las letras; cada bloque va desfasado para que no se muevan a la vez. */
+.vt-kpi {
+	border-radius: var(--ob-card-radius); padding: 24px;
+	background: var(--vt-link-grad-dark) 0 0 / 300% 100%;
+	animation: vt-shimmer 12s linear infinite;
+}
+.vt-kpi:nth-child(2) { animation-delay: -3s; }
+.vt-kpi:nth-child(3) { animation-delay: -6s; }
+.vt-kpi:nth-child(4) { animation-delay: -9s; }
+.vt-kpi h3 { font: 600 14px/1.3 var(--ob-font); margin: 0 0 14px; color: #2b2b33; letter-spacing: 0; }
 .vt-kpi strong { display: block; font-family: var(--ob-font-display); font-weight: 400; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.vt-kpi p { margin: 8px 0 0; font-size: 14px; color: #333; }
+.vt-kpi p { margin: 8px 0 0; font-size: 14px; color: #222; }
+@media (prefers-reduced-motion: reduce) { .vt-kpi { animation: none; } }
+.a11y-reduce-motion .vt-kpi { animation: none; }
 
 /* ---------- Breakpoints ---------- */
 @media only screen and (max-width: 1068px) {
