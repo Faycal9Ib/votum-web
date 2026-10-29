@@ -285,9 +285,19 @@ h1, h2, h3, h4 { font-family: var(--ob-font-display); font-weight: 400; letter-s
 	text-align: center;
 }
 .vt-trail__cell {
+	position: relative; isolation: isolate;
 	display: block; width: 100%; height: 100%;
+	text-shadow: 0 0 3px var(--vt-fill, transparent);
 	transform: scale(0);
 	transition: transform .12s cubic-bezier(.3, .41, .04, 1.01);
+}
+/* Cada celda tiene la silueta del logotipo de Votum: el color va en un pseudo-elemento
+   recortado con el SVG, así la letra queda encima entera y no se recorta con la máscara. */
+.vt-trail__cell::before {
+	content: ""; position: absolute; inset: 0; z-index: -1;
+	background: var(--vt-fill, #9a7be6);
+	-webkit-mask: url("assets/img/votumlabs-fav.svg") center / contain no-repeat;
+	mask: url("assets/img/votumlabs-fav.svg") center / contain no-repeat;
 }
 .vt-trail__block.is-active .vt-trail__cell { transform: scale(1); transition-duration: .1s; }
 
@@ -401,7 +411,8 @@ a.ob-lang__item:hover, a.ob-lang__item:focus-visible { background: var(--ob-bg-a
 
 /* ---------- Rastro: separadores entre palabras clave ---------- */
 .vt-trail__block.is-sep .vt-trail__cell {
-	background: #fff; color: #9a7be6; box-shadow: inset 0 0 0 1px #9a7be6; font-size: 12px;
+	--vt-fill: #ece4ff; color: #9a7be6; font-size: 12px;
+	filter: drop-shadow(0 0 .6px #9a7be6);   /* contorno violeta alrededor de la silueta */
 }
 
 /* ---------- Enlaces que se iluminan con los colores de la marca ---------- */

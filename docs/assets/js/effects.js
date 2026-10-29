@@ -5,7 +5,7 @@
  *    antes de fijarse, cada posición «baraja» 2–3 glifos de laboratorio en color de acento.
  *    - data-vt-decode            → al entrar en pantalla (una vez)
  *    - data-vt-decode="hover"    → al pasar el ratón (cada vez)
- * 2. Rastro de laboratorio: un pool de cuadros de 20 px sigue al cursor sobre una rejilla y
+ * 2. Rastro de laboratorio: un pool de celdas de 20 px con la silueta del logotipo de Votum sigue al cursor sobre una rejilla y
  *    va deletreando palabras clave (Votum Labs, SosPets, Cronidol, CBD…) separadas por símbolos.
  *    Solo sobre zonas sin texto.
  *
@@ -236,7 +236,7 @@
 			clearTimeout( b.timer );
 			b.el.style.transform = `translate(${ x }px, ${ y }px)`;
 			b.el.classList.toggle( 'is-sep', token.sep );
-			b.cell.style.backgroundColor = token.sep ? '' : token.color;
+			b.cell.style.setProperty( '--vt-fill', token.sep ? '' : token.color ); // relleno de la silueta del logo
 			b.cell.style.color = token.sep ? '' : ( DARK_TEXT_ON.has( token.color ) ? '#000' : '#fff' );
 			b.cell.textContent = token.ch;
 			b.el.classList.remove( 'is-active' );
