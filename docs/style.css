@@ -280,14 +280,20 @@ h1, h2, h3, h4 { font-family: var(--ob-font-display); font-weight: 400; letter-s
 
 .vt-trail { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
 .vt-trail__block {
-	position: absolute; top: 0; left: 0; width: 20px; height: 20px;
-	font: 600 10px/20px ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+	position: absolute; top: 0; left: 0; width: 24px; height: 24px;
+	font: 700 12px/24px ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 	text-align: center;
 }
 .vt-trail__cell {
 	position: relative; isolation: isolate;
 	display: block; width: 100%; height: 100%;
-	text-shadow: 0 0 3px var(--vt-fill, transparent);
+	/* La letra se lee aunque caiga en el hueco del logo sobre fondo blanco o negro:
+	   un halo de contraste (oscuro para letra blanca, claro para letra negra, lo fija effects.js)
+	   y debajo un contorno del color de la celda. */
+	text-shadow:
+		0 0 1px var(--vt-halo, transparent), 0 0 2px var(--vt-halo, transparent),
+		1px 0 0 var(--vt-fill, transparent), -1px 0 0 var(--vt-fill, transparent),
+		0 1px 0 var(--vt-fill, transparent), 0 -1px 0 var(--vt-fill, transparent);
 	transform: scale(0);
 	transition: transform .12s cubic-bezier(.3, .41, .04, 1.01);
 }
@@ -411,7 +417,7 @@ a.ob-lang__item:hover, a.ob-lang__item:focus-visible { background: var(--ob-bg-a
 
 /* ---------- Rastro: separadores entre palabras clave ---------- */
 .vt-trail__block.is-sep .vt-trail__cell {
-	--vt-fill: #ece4ff; color: #9a7be6; font-size: 12px;
+	--vt-fill: #ece4ff; color: #9a7be6; font-size: 14px;
 	filter: drop-shadow(0 0 .6px #9a7be6);   /* contorno violeta alrededor de la silueta */
 }
 

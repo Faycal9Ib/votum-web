@@ -5,7 +5,7 @@
  *    antes de fijarse, cada posición «baraja» 2–3 glifos de laboratorio en color de acento.
  *    - data-vt-decode            → al entrar en pantalla (una vez)
  *    - data-vt-decode="hover"    → al pasar el ratón (cada vez)
- * 2. Rastro de laboratorio: un pool de celdas de 20 px con la silueta del logotipo de Votum sigue al cursor sobre una rejilla y
+ * 2. Rastro de laboratorio: un pool de celdas de 24 px con la silueta del logotipo de Votum sigue al cursor sobre una rejilla y
  *    va deletreando palabras clave (Votum Labs, SosPets, Cronidol, CBD…) separadas por símbolos.
  *    Solo sobre zonas sin texto.
  *
@@ -149,10 +149,10 @@
 	/* =========================================================
 	 * 2. Rastro de laboratorio bajo el cursor
 	 * ======================================================= */
-	const CELL = 20;
-	const POOL = 24;          // cuadros reutilizables
-	// Vida de cada cuadro: 140–460 ms, como el original. Más largo da sensación de web lenta.
-	const lifetime = () => 140 + Math.random() * 320;
+	const CELL = 24;
+	const POOL = 30;          // celdas reutilizables (más, porque ahora duran más en pantalla)
+	// Vida de cada celda: 640–960 ms (la del original + medio segundo, para leer las palabras).
+	const lifetime = () => 640 + Math.random() * 320;
 	const RESTART_AFTER = 900; // si el cursor se para más que esto, la siguiente letra empieza palabra nueva
 	const KEYWORDS = [ 'VOTUM LABS', 'SOSPETS', 'CRONIDOL', 'CBD', 'CBG', 'CBN', 'VEZELAY LAB' ];
 	const SEPARATORS = [ '+', '−', '=', '·', '/', '°', 'µ', 'Δ', '%' ];
@@ -237,7 +237,10 @@
 			b.el.style.transform = `translate(${ x }px, ${ y }px)`;
 			b.el.classList.toggle( 'is-sep', token.sep );
 			b.cell.style.setProperty( '--vt-fill', token.sep ? '' : token.color ); // relleno de la silueta del logo
-			b.cell.style.color = token.sep ? '' : ( DARK_TEXT_ON.has( token.color ) ? '#000' : '#fff' );
+			const tinta = DARK_TEXT_ON.has( token.color );
+			b.cell.style.color = token.sep ? '' : ( tinta ? '#000' : '#fff' );
+			// Halo de contraste para que la letra se lea también fuera del logo (fondo blanco o negro)
+			b.cell.style.setProperty( '--vt-halo', token.sep ? '' : ( tinta ? 'rgba(255,255,255,.9)' : 'rgba(30,16,72,.85)' ) );
 			b.cell.textContent = token.ch;
 			b.el.classList.remove( 'is-active' );
 			void b.el.offsetWidth; // reinicia la transición si el cuadro se reutiliza antes de apagarse
